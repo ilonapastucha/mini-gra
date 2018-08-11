@@ -1,9 +1,3 @@
-/*
-1 - paper
-2 - scissors
-3 - rock
-*/
-
 "use strict";
 (function(){
 	
@@ -16,6 +10,8 @@
 	var scissorsButton = document.getElementById('scissors');
 	var rounds= document.getElementById('rounds');
 	var roundNumber = 0;
+	var computerScoreInt = 0;
+	var playerScoreInt = 0;
 	var enter = function(){
 		return '<br><br>';
 	};
@@ -28,6 +24,25 @@
 		return Math.floor(Math.random() * 3) + 1;
 	};
 
+	var choiceToText = function(int) {
+		if (int == 1){
+			return 'paper';
+		} else if (int == 2) {
+			return 'scissors';
+		} else { /*3*/
+			return 'rock'; 
+		}
+	};
+	var choiceToInt = function(txt) {
+		if (txt === 'paper'){
+			return 1;
+		} else if (txt === 'scissors') {
+			return 2;
+		} else { /*rock*/
+			return 3; 
+		}
+	};
+
 	var compare = function(player, computer) {
 		if (player === computer) {
 			return 'Draw!';
@@ -38,26 +53,18 @@
 		}
 	};
 
-	var choiceToText = function(int) {
-		if (int == 1){
-			return 'paper';
-		} else if (int == 2) {
-			return 'scissors';
-		} else {
-			return 'rock';
-		}
-	};
-
 	var addScore = function(result) {
 		if (result === 'You won!') {
-			playerScore.innerHTML = parseInt(playerScore.innerText) + 1;
+			playerScoreInt++;
+			playerScore.innerHTML = playerScoreInt;
 		} else if (result === 'You lose!'){
-			computerScore.innerHTML = parseInt(computerScore.innerText) + 1;
+			computerScoreInt++;
+			computerScore.innerHTML = computerScoreInt;
 		}
 	};
 
 	var StopGame = function(onOff) {
-		if(onOff ==='true'){
+		if(onOff ===true){
 			scissorsButton.setAttribute("disabled","disabled");
 			paperButton.setAttribute("disabled","disabled");
 			rockButton.setAttribute("disabled","disabled");
@@ -67,17 +74,18 @@
 			rockButton.removeAttribute("disabled");
 		}
 	};
+	
 	var Game = function(choise){
 		var playerChoice = choise;
 		var computerChoice = randomChoice();
 		var roundResult = compare(playerChoice, computerChoice);
 		addScore(roundResult);
-		if (playerScore.innerText === roundNumber){
+		if (playerScoreInt === roundNumber){
 			output.innerHTML = enter() + 'YOU WON THE GAME !'; 
-			StopGame('true');
-		} else if (computerScore.innerText === roundNumber){
+			StopGame(true);
+		} else if (computerScoreInt === roundNumber){
 			output.innerHTML = enter() + 'YOU LOSE THE GAME !';
-			StopGame('true');
+			StopGame(true);
 		} else { 
 			output.innerHTML = roundResult + ' Computer chose ' + choiceToText(computerChoice) + ' , You chose ' + choiceToText(playerChoice) + enter() + output.innerHTML;
 		}
@@ -91,23 +99,26 @@
 		if (isProperly(roundNumber)){
 			rounds.innerHTML = 'No value added !';
 		} else {
+			roundNumber = parseInt(roundNumber);
 			rounds.innerHTML = 'We play to ' + roundNumber + ' victories!';
 			output.innerHTML ='';
 			computerScore.innerHTML = '0';
 			playerScore.innerHTML = '0';
-			StopGame('false');
+			computerScoreInt = 0;
+			playerScoreInt = 0;
+			StopGame(false);
 		}
 	});
 
 	paperButton.addEventListener('click', function(){
-		Game(1);
+		Game(choiceToInt('paper'));
 	});
 
 	rockButton.addEventListener('click', function(){
-		Game(3);
+		Game(choiceToInt('rock'));
 	});
 
 	scissorsButton.addEventListener('click', function(){
-		Game(2);
+		Game(choiceToInt('scissors'));
 	});
 })();
