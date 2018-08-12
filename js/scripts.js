@@ -12,6 +12,8 @@
 	var roundNumber = 0;
 	var computerScoreInt = 0;
 	var playerScoreInt = 0;
+	var choices = ['paper', 'scissors', 'rock'];
+
 	var enter = function(){
 		return '<br><br>';
 	};
@@ -21,50 +23,25 @@
 	};
 
 	var randomChoice = function() {
-		return Math.floor(Math.random() * 3) + 1;
-	};
-
-	var choiceToText = function(int) {
-		if (int == 1){
-			return 'paper';
-		} else if (int == 2) {
-			return 'scissors';
-		} else { /*3*/
-			return 'rock'; 
-		}
-	};
-	var choiceToInt = function(txt) {
-		if (txt === 'paper'){
-			return 1;
-		} else if (txt === 'scissors') {
-			return 2;
-		} else { /*rock*/
-			return 3; 
-		}
+		return choices[Math.floor(Math.random() * 3)];
 	};
 
 	var compare = function(player, computer) {
 		if (player === computer) {
 			return 'Draw!';
-		} else if (player - computer == 1 || player - computer == -2) {
+		} else if ((player === 'paper' && computer === 'rock') || (player === 'rock' && computer === 'scissors') || (player === 'scissors' && computer === 'paper')) {
+			playerScoreInt++;
+			playerScore.innerHTML = playerScoreInt;
 			return 'You won!';
 		} else {
+			computerScoreInt++;
+			computerScore.innerHTML = computerScoreInt;
 			return 'You lose!';
 		}
 	};
 
-	var addScore = function(result) {
-		if (result === 'You won!') {
-			playerScoreInt++;
-			playerScore.innerHTML = playerScoreInt;
-		} else if (result === 'You lose!'){
-			computerScoreInt++;
-			computerScore.innerHTML = computerScoreInt;
-		}
-	};
-
 	var StopGame = function(onOff) {
-		if(onOff ===true){
+		if(onOff){
 			scissorsButton.setAttribute("disabled","disabled");
 			paperButton.setAttribute("disabled","disabled");
 			rockButton.setAttribute("disabled","disabled");
@@ -79,7 +56,6 @@
 		var playerChoice = choise;
 		var computerChoice = randomChoice();
 		var roundResult = compare(playerChoice, computerChoice);
-		addScore(roundResult);
 		if (playerScoreInt === roundNumber){
 			output.innerHTML = enter() + 'YOU WON THE GAME !'; 
 			StopGame(true);
@@ -87,7 +63,7 @@
 			output.innerHTML = enter() + 'YOU LOSE THE GAME !';
 			StopGame(true);
 		} else { 
-			output.innerHTML = roundResult + ' Computer chose ' + choiceToText(computerChoice) + ' , You chose ' + choiceToText(playerChoice) + enter() + output.innerHTML;
+			output.innerHTML = roundResult + ' Computer chose ' + computerChoice + ' , You chose ' + playerChoice + enter() + output.innerHTML;
 		}
 	};
 	
@@ -111,14 +87,14 @@
 	});
 
 	paperButton.addEventListener('click', function(){
-		Game(choiceToInt('paper'));
+		Game('paper');
 	});
 
 	rockButton.addEventListener('click', function(){
-		Game(choiceToInt('rock'));
+		Game('rock');
 	});
 
 	scissorsButton.addEventListener('click', function(){
-		Game(choiceToInt('scissors'));
+		Game('scissors');
 	});
 })();
