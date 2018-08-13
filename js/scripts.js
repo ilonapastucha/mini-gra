@@ -13,9 +13,10 @@
 		roundNumber: 0,
 		computerScoreInt: 0,
 		playerScoreInt: 0,
-		choices: ['paper', 'scissors', 'rock']
+		choices: ['paper', 'scissors', 'rock'],
+		tableForScore: [] /* tablica ktora przechowuje obiekty; obiekt= wynik danej rundy */
 	};
-
+	
 	var enter = function () {
 		return '<br><br>';
 	};
@@ -44,6 +45,7 @@
 
 	var StopGame = function (onOff) {
 		if (onOff) {
+			scoresTable();
 			params.scissorsButton.setAttribute("disabled", "disabled");
 			params.paperButton.setAttribute("disabled", "disabled");
 			params.rockButton.setAttribute("disabled", "disabled");
@@ -54,18 +56,22 @@
 		}
 	};
 
-	var scoresTable = function(gameRound, playerChoice, computerChoice, roundResult){
-		var table = document.getElementById('scores');
-		var tr = document.createElement('tr');
-		tr.innerHTML = '<td>' + gameRound + '</td><td>' + computerChoice + '</td><td>' + playerChoice + '</td><td>' + roundResult + '</td><td>' + params.computerScoreInt + ':' + params.playerScoreInt + '</td>';
-		table.appendChild(tr);
+	/*ponizej funkcja generująca html z tabelką z wynikami do modala*/
+	var scoresTable = function(){
+		params.tableForScore.forEach(function(elem) {
+			document.querySelector('#scores tbody').innerHTML += '<td>' + elem.gameRound + '</td><td>' + elem.computerChoice + '</td><td>' + elem.playerChoice + '</td><td>' + elem.roundResult + '</td><td>' + elem.computerScoreInt + ':' + elem.playerScoreInt + '</td>';
+		});
+		
 	}
 
+	/*ponizej funkcja która wykonuje się dla każdej rundy*/
 	var Game = function (event) {
 		var playerChoice = event.target.id;
 		var computerChoice = randomChoice();
 		var roundResult = compare(playerChoice, computerChoice);
-		scoresTable(params.gameRound, playerChoice, computerChoice, roundResult);
+		/*ponizej stworzenie obiektu z wynikami rundy*/
+		var objectForScore = {gameRound: params.gameRound, playerChoice: playerChoice, computerChoice: computerChoice, roundResult: roundResult, computerScoreInt: params.computerScoreInt, playerScoreInt: params.playerScoreInt};
+		params.tableForScore.push(objectForScore); /* dodanie obiektu do tablicy po każdej rundzie*/
 		params.gameRound++;
 		if (params.playerScoreInt === params.roundNumber) {
 			document.querySelector('#modal-winners').classList.add('show');
@@ -123,13 +129,7 @@
 			params.playerScoreInt = 0;
 			params.gameRound = 1;
 			StopGame(false);
-			var table = document.getElementById('scores');
-			var tableRows = table.getElementsByTagName('tr');
-			var rowCount = table.rows.length;
-			for (var x=rowCount-1; x>0; x--){
-				table.removeChild(tableRows[x]);
-			}
-			
+			document.querySelector('#scores tbody').innerHTML = '';
 		}
 	});
 
