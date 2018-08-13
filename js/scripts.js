@@ -1,100 +1,136 @@
 "use strict";
-(function(){
-	
-	var computerScore = document.getElementById('computerScore');
-	var playerScore = document.getElementById('playerScore');
-	var newGamebutton = document.getElementById('newGame');
-	var output = document.getElementById('output');
-	var paperButton = document.getElementById('paper');
-	var rockButton = document.getElementById('rock');
-	var scissorsButton = document.getElementById('scissors');
-	var rounds= document.getElementById('rounds');
-	var roundNumber = 0;
-	var computerScoreInt = 0;
-	var playerScoreInt = 0;
-	var choices = ['paper', 'scissors', 'rock'];
+(function () {
+	var params = {
+		computerScore: document.getElementById('computerScore'),
+		playerScore: document.getElementById('playerScore'),
+		newGamebutton: document.getElementById('newGame'),
+		output: document.getElementById('output'),
+		paperButton: document.getElementById('paper'),
+		rockButton: document.getElementById('rock'),
+		scissorsButton: document.getElementById('scissors'),
+		rounds: document.getElementById('rounds'),
+		gameRound: 1,
+		roundNumber: 0,
+		computerScoreInt: 0,
+		playerScoreInt: 0,
+		choices: ['paper', 'scissors', 'rock']
+	};
 
-	var enter = function(){
+	var enter = function () {
 		return '<br><br>';
 	};
 
-	var isProperly = function(number) {
+	var isProperly = function (number) {
 		return (isNaN(parseInt(number)) || number === '' || number == null) ? true : false;
 	};
 
-	var randomChoice = function() {
-		return choices[Math.floor(Math.random() * 3)];
+	var randomChoice = function () {
+		return params.choices[Math.floor(Math.random() * 3)];
 	};
 
-	var compare = function(player, computer) {
+	var compare = function (player, computer) {
 		if (player === computer) {
 			return 'Draw!';
 		} else if ((player === 'paper' && computer === 'rock') || (player === 'rock' && computer === 'scissors') || (player === 'scissors' && computer === 'paper')) {
-			playerScoreInt++;
-			playerScore.innerHTML = playerScoreInt;
+			params.playerScoreInt++;
+			params.playerScore.innerHTML = params.playerScoreInt;
 			return 'You won!';
 		} else {
-			computerScoreInt++;
-			computerScore.innerHTML = computerScoreInt;
+			params.computerScoreInt++;
+			params.computerScore.innerHTML = params.computerScoreInt;
 			return 'You lose!';
 		}
 	};
 
-	var StopGame = function(onOff) {
-		if(onOff){
-			scissorsButton.setAttribute("disabled","disabled");
-			paperButton.setAttribute("disabled","disabled");
-			rockButton.setAttribute("disabled","disabled");
+	var StopGame = function (onOff) {
+		if (onOff) {
+			params.scissorsButton.setAttribute("disabled", "disabled");
+			params.paperButton.setAttribute("disabled", "disabled");
+			params.rockButton.setAttribute("disabled", "disabled");
 		} else {
-			scissorsButton.removeAttribute("disabled");
-			paperButton.removeAttribute("disabled");
-			rockButton.removeAttribute("disabled");
+			params.scissorsButton.removeAttribute("disabled");
+			params.paperButton.removeAttribute("disabled");
+			params.rockButton.removeAttribute("disabled");
 		}
 	};
-	
-	var Game = function(choise){
-		var playerChoice = choise;
+
+	var scoresTable = function(gameRound, playerChoice, computerChoice, roundResult){
+		var table = document.getElementById('scores');
+		var tr = document.createElement('tr');
+		tr.innerHTML = '<td>' + gameRound + '</td><td>' + computerChoice + '</td><td>' + playerChoice + '</td><td>' + roundResult + '</td><td>' + params.computerScoreInt + ':' + params.playerScoreInt + '</td>';
+		table.appendChild(tr);
+	}
+
+	var Game = function (event) {
+		var playerChoice = event.target.id;
 		var computerChoice = randomChoice();
 		var roundResult = compare(playerChoice, computerChoice);
-		if (playerScoreInt === roundNumber){
-			output.innerHTML = enter() + 'YOU WON THE GAME !'; 
+		scoresTable(params.gameRound, playerChoice, computerChoice, roundResult);
+		params.gameRound++;
+		if (params.playerScoreInt === params.roundNumber) {
+			document.querySelector('#modal-winners').classList.add('show');
+			document.querySelector('#modal-win').classList.add('show');
+			document.querySelector('#modal-score').classList.add('show');
 			StopGame(true);
-		} else if (computerScoreInt === roundNumber){
-			output.innerHTML = enter() + 'YOU LOSE THE GAME !';
+		} else if (params.computerScoreInt === params.roundNumber) {
+			document.querySelector('#modal-winners').classList.add('show');
+			document.querySelector('#modal-loss').classList.add('show');
+			document.querySelector('#modal-score').classList.add('show');
 			StopGame(true);
-		} else { 
-			output.innerHTML = roundResult + ' Computer chose ' + computerChoice + ' , You chose ' + playerChoice + enter() + output.innerHTML;
+		} else {
+			params.output.innerHTML = roundResult + ' Computer chose ' + computerChoice + ' , You chose ' + playerChoice + enter() + params.output.innerHTML;
 		}
 	};
-	
-	computerScore.innerHTML = '0';
-	playerScore.innerHTML = '0';
 
-	newGamebutton.addEventListener('click', function(){
-		roundNumber = window.prompt('To what result we play ?');
-		if (isProperly(roundNumber)){
-			rounds.innerHTML = 'No value added !';
+	var hideModal = function(event){
+		event.preventDefault();
+		document.querySelector('#modal-winners').classList.remove('show');
+		document.querySelector('#modal-win').classList.remove('show');
+		document.querySelector('#modal-loss').classList.remove('show');
+		document.querySelector('#modal-score').classList.remove('show');
+	};
+
+	document.querySelector('#modal-winners').addEventListener('click', hideModal);
+	
+	var modals = document.querySelectorAll('.modal');
+	
+	for(var i = 0; i < modals.length; i++){
+		modals[i].addEventListener('click', function(event){
+			event.stopPropagation();
+		});
+	}
+	
+	var playerMoves = document.querySelectorAll('.player-move');
+
+	for (var i = 0; i < playerMoves.length; i++) {
+		playerMoves[i].addEventListener('click', Game);
+	};
+
+	params.computerScore.innerHTML = '0';
+	params.playerScore.innerHTML = '0';
+
+	params.newGamebutton.addEventListener('click', function () {
+		params.roundNumber = window.prompt('To what result we play ?');
+		if (isProperly(params.roundNumber)) {
+			params.rounds.innerHTML = 'No value added !';
 		} else {
-			roundNumber = parseInt(roundNumber);
-			rounds.innerHTML = 'We play to ' + roundNumber + ' victories!';
-			output.innerHTML ='';
-			computerScore.innerHTML = '0';
-			playerScore.innerHTML = '0';
-			computerScoreInt = 0;
-			playerScoreInt = 0;
+			params.roundNumber = parseInt(params.roundNumber);
+			params.rounds.innerHTML = 'We play to ' + params.roundNumber + ' victories!';
+			params.output.innerHTML = '';
+			params.computerScore.innerHTML = '0';
+			params.playerScore.innerHTML = '0';
+			params.computerScoreInt = 0;
+			params.playerScoreInt = 0;
+			params.gameRound = 1;
 			StopGame(false);
+			var table = document.getElementById('scores');
+			var tableRows = table.getElementsByTagName('tr');
+			var rowCount = table.rows.length;
+			for (var x=rowCount-1; x>0; x--){
+				table.removeChild(tableRows[x]);
+			}
+			
 		}
 	});
 
-	paperButton.addEventListener('click', function(){
-		Game('paper');
-	});
-
-	rockButton.addEventListener('click', function(){
-		Game('rock');
-	});
-
-	scissorsButton.addEventListener('click', function(){
-		Game('scissors');
-	});
 })();
