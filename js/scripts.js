@@ -128,6 +128,7 @@
 			params.computerScoreInt = 0;
 			params.playerScoreInt = 0;
 			params.gameRound = 1;
+			params.tableForScore = [];
 			StopGame(false);
 			document.querySelector('#scores tbody').innerHTML = '';
 		}
